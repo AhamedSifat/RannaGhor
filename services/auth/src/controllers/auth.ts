@@ -52,3 +52,10 @@ export const addUserRole = tryCatch(async (req: AuthenticatedRequest, res) => {
 
   res.status(200).json({ message: 'Role added successfully', user, token });
 });
+
+export const myProfile = tryCatch(async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  res.status(200).json({ user: req.user });
+});
