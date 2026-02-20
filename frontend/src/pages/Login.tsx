@@ -4,6 +4,7 @@ import { loginWithGoogle } from '../services/authApi';
 import toast from 'react-hot-toast';
 import { useGoogleLogin } from '@react-oauth/google';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuthStore } from '../stores/authStore';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,8 +14,13 @@ const Login = () => {
 
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
-      toast.success(data.message);
+      useAuthStore.setState({
+        user: data.user,
+        isAuth: true,
+        isLoading: false,
+      });
       navigate('/');
+      toast.success(data.message);
     },
 
     onError: () => {
