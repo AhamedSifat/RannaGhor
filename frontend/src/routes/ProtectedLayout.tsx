@@ -1,9 +1,9 @@
-import { Navigate, Outlet } from 'react-router';
+import { Navigate, Outlet, useLocation } from 'react-router';
 import { useAuthStore } from '../stores/authStore';
 
 export default function ProtectedLayout() {
-  const { isAuth, isLoading } = useAuthStore();
-
+  const { isAuth, user, isLoading } = useAuthStore();
+  const location = useLocation();
   if (isLoading) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-white to-pink-50'>
@@ -26,6 +26,14 @@ export default function ProtectedLayout() {
     );
   }
   if (!isAuth) return <Navigate to='/login' replace />;
+
+  if (user?.role === null && location.pathname !== '/select-role') {
+    return <Navigate to='/select-role' replace />;
+  }
+
+  if (user?.role !== null && location.pathname === '/select-role') {
+    return <Navigate to='/' replace />;
+  }
 
   return <Outlet />;
 }

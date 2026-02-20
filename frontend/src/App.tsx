@@ -6,6 +6,7 @@ import GuestLayout from './routes/GuestLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import { useAuthStore } from './stores/authStore';
+import SelectRole from './pages/SelectRole';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -20,6 +21,7 @@ export default function App() {
         {/* PRIVATE ROUTES */}
         <Route element={<ProtectedLayout />}>
           <Route path='/' element={<Home />} />
+          <Route path='/select-role' element={<SelectRole />} />
         </Route>
 
         {/* PUBLIC ROUTES */}
