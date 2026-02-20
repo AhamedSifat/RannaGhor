@@ -16,7 +16,9 @@ export const loginUser = tryCatch(async (req, res) => {
     console.error('Google OAuth credentials not set');
     return res
       .status(500)
-      .json({ message: 'Server configuration error: Google credentials missing' });
+      .json({
+        message: 'Server configuration error: Google credentials missing',
+      });
   }
 
   // exchange the authorization code for tokens
