@@ -1,18 +1,33 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
+import ProtectedLayout from './routes/ProtectedLayout';
+import GuestLayout from './routes/GuestLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './stores/authStore';
 
 export default function App() {
+  const fetchUser = useAuthStore((state) => state.fetchUser);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
+    <BrowserRouter>
+      <Routes>
+        {/* PRIVATE ROUTES */}
+        <Route element={<ProtectedLayout />}>
           <Route path='/' element={<Home />} />
+        </Route>
+
+        {/* PUBLIC ROUTES */}
+        <Route element={<GuestLayout />}>
           <Route path='/login' element={<Login />} />
-        </Routes>
-        <Toaster />
-      </BrowserRouter>
-    </>
+        </Route>
+      </Routes>
+      <Toaster />
+    </BrowserRouter>
   );
 }
