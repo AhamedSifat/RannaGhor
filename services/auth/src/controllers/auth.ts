@@ -11,6 +11,15 @@ export const loginUser = tryCatch(async (req, res) => {
     return res.status(400).json({ message: 'Authorization code is required' });
   }
 
+  // sanity check that OAuth credentials are loaded
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    console.error('Google OAuth credentials not set');
+    return res
+      .status(500)
+      .json({ message: 'Server configuration error: Google credentials missing' });
+  }
+
+  // exchange the authorization code for tokens
   const googleResponse = await oauth2Client.getToken(code);
   oauth2Client.setCredentials(googleResponse.tokens);
 
