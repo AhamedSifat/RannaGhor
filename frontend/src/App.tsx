@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { useAuthStore } from './stores/authStore';
 import SelectRole from './pages/SelectRole';
+import Navbar from './components/Navbar';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -17,6 +18,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <Navbar />
       <Routes>
         {/* PRIVATE ROUTES */}
         <Route element={<ProtectedLayout />}>
