@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import { useAuthStore } from './stores/authStore';
 import SelectRole from './pages/SelectRole';
 import Navbar from './components/Navbar';
+import Profile from './pages/Profile';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -24,6 +25,7 @@ export default function App() {
         <Route element={<ProtectedLayout />}>
           <Route path='/' element={<Home />} />
           <Route path='/select-role' element={<SelectRole />} />
+          <Route path='/profile' element={<Profile />} />
         </Route>
 
         {/* PUBLIC ROUTES */}
