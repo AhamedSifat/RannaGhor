@@ -21,12 +21,17 @@ type AuthState = {
   isLoading: boolean;
   logout: () => void;
   fetchUser: () => Promise<void>;
+  location: LocationData | null;
+  getLocation: () => Promise<void>;
+  city: string | null;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuth: false,
   isLoading: true,
+  location: null,
+  city: null,
 
   logout: () => {
     localStorage.removeItem('token');
@@ -68,5 +73,47 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
       });
     }
+  },
+
+  getLocation: async () => {
+    if (!navigator.geolocation) {
+      alert('Please Allow Location Access to use this app');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+          );
+
+          const data = await res.json();
+
+          const detectedCity =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.state ||
+            'Unknown City';
+
+          set({
+            location: {
+              latitude,
+              longitude,
+              formattedAddress: data.display_name || 'Unknown Location',
+            },
+            city: detectedCity,
+          });
+        } catch (err) {
+          console.error('Reverse geocoding failed:', err);
+        }
+      },
+      (error) => {
+        console.error('Location error:', error);
+      },
+    );
   },
 }));

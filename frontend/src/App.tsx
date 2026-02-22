@@ -12,9 +12,11 @@ import Profile from './pages/Profile';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
+  const getLocation = useAuthStore((state) => state.getLocation);
 
   useEffect(() => {
     fetchUser();
+    getLocation();
   }, []);
 
   return (
