@@ -51,12 +51,36 @@ export const addRestaurant = tryCatch(
       });
     }
 
-    const { data: UploadResult } = await axios.post(
-      `${process.env.UTILS_SERVICE}/api/upload`,
-      {
+    // make sure we have a utilities service endpoint configured
+    const utilsUrl = process.env.UTILS_SERVICE_URL;
+    if (!utilsUrl) {
+      console.error('UTILS_SERVICE_URL not set');
+      return res.status(500).json({
+        success: false,
+        error: 'Server configuration error: Upload service unavailable',
+      });
+    }
+
+    let uploadResult;
+    try {
+      const response = await axios.post(`${utilsUrl}/api/upload`, {
         buffer: fileBuffer.content,
-      },
-    );
+      });
+      uploadResult = response.data;
+    } catch (err: any) {
+      console.error('Upload to utils service failed', err?.message || err);
+      // if utils service returned 413, propagate a meaningful message
+      if (err.response?.status === 413) {
+        return res.status(413).json({
+          success: false,
+          error: 'Image payload too large',
+        });
+      }
+      return res.status(502).json({
+        success: false,
+        error: 'Failed to upload image',
+      });
+    }
 
     const newRestaurant = await Restaurant.create({
       name,
@@ -67,8 +91,9 @@ export const addRestaurant = tryCatch(
         coordinates: [Number(longitude), Number(latitude)],
         formattedAddress,
       },
-      image: UploadResult.url,
+      image: uploadResult?.url,
       ownerId: user._id,
+      isVerified: false,
     });
 
     if (!newRestaurant) {

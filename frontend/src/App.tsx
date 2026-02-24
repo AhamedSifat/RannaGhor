@@ -10,6 +10,7 @@ import SelectRole from './pages/SelectRole';
 import Navbar from './components/Navbar';
 import Profile from './pages/Profile';
 import Restaurant from './pages/Restaurant';
+export const RESTAURANT_API_URL = 'http://localhost:5001';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);

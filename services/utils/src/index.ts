@@ -10,8 +10,21 @@ const app = express();
 const PORT = process.env.PORT || 5002;
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// log incoming request sizes for debugging large uploads
+app.use((req, res, next) => {
+  const len = req.headers['content-length'];
+  if (len) {
+    console.log(
+      `utils service received ${req.method} ${req.path} (${len} bytes)`,
+    );
+  }
+  next();
+});
+
+
+app.use(express.json({ limit: '200mb' }));
+app.use(express.urlencoded({ extended: true, limit: '200mb' }));
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
