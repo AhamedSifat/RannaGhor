@@ -15,16 +15,11 @@ export const RESTAURANT_API_URL = 'http://localhost:5001';
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const getLocation = useAuthStore((state) => state.getLocation);
-  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     fetchUser();
     getLocation();
   }, []);
-
-  if (user && user.role === 'seller') {
-    return <Restaurant />;
-  }
 
   return (
     <BrowserRouter>
@@ -33,6 +28,8 @@ export default function App() {
         {/* PRIVATE ROUTES */}
         <Route element={<ProtectedLayout />}>
           <Route path='/' element={<Home />} />
+          <Route path='/restaurant' element={<Restaurant />} />
+
           <Route path='/select-role' element={<SelectRole />} />
           <Route path='/profile' element={<Profile />} />
         </Route>

@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 export default function ProtectedLayout() {
   const { isAuth, user, isLoading } = useAuthStore();
   const location = useLocation();
+
   if (isLoading) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-white to-pink-50'>
@@ -25,13 +26,26 @@ export default function ProtectedLayout() {
       </div>
     );
   }
+
   if (!isAuth) return <Navigate to='/login' replace />;
 
+  //  If role not selected
   if (user?.role === null && location.pathname !== '/select-role') {
     return <Navigate to='/select-role' replace />;
   }
 
+  //  If role already selected, block select-role page
   if (user?.role !== null && location.pathname === '/select-role') {
+    return <Navigate to='/' replace />;
+  }
+
+  //  SELLER CAN'T ACCESS "/"
+  if (user?.role === 'seller' && location.pathname === '/') {
+    return <Navigate to='/restaurant' replace />;
+  }
+
+  //  NORMAL USER CAN'T ACCESS "/restaurant"
+  if (user?.role !== 'seller' && location.pathname === '/restaurant') {
     return <Navigate to='/' replace />;
   }
 
