@@ -6,8 +6,7 @@ export interface IUser {
   email: string;
   image: string;
   role: string;
-  createdAt: Date;
-  updatedAt: Date;
+  resturantId: string;
 }
 export interface AuthenticatedRequest extends Request {
   user?: IUser | null;

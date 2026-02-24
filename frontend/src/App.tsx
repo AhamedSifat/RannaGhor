@@ -9,15 +9,21 @@ import { useAuthStore } from './stores/authStore';
 import SelectRole from './pages/SelectRole';
 import Navbar from './components/Navbar';
 import Profile from './pages/Profile';
+import Restaurant from './pages/Restaurant';
 
 export default function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const getLocation = useAuthStore((state) => state.getLocation);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     fetchUser();
     getLocation();
   }, []);
+
+  if (user && user.role === 'seller') {
+    return <Restaurant />;
+  }
 
   return (
     <BrowserRouter>

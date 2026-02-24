@@ -4,6 +4,7 @@ import { tryCatch } from '../middlewares/trycatch.js';
 import Restaurant from '../models/Restaurant.js';
 import getBufferDataUri from '../config/datauri.js';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 export const addRestaurant = tryCatch(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -80,6 +81,54 @@ export const addRestaurant = tryCatch(
     res.status(201).json({
       success: true,
       restaurant: newRestaurant,
+    });
+  },
+);
+
+export const fetchMyRestaurant = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    const restaurant = await Restaurant.findOne({ ownerId: user._id });
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    if (!req.user?.resturantId) {
+      const token = jwt.sign(
+        {
+          user: {
+            ...req.user,
+            resturantId: restaurant._id,
+          },
+        },
+        process.env.JWT_SECRET!,
+        {
+          expiresIn: '15d',
+        },
+      );
+
+      res.status(200).json({
+        success: true,
+        restaurant,
+        token,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      restaurant,
     });
   },
 );
