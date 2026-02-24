@@ -2,6 +2,7 @@ import express from 'express';
 import dovenv from 'dotenv';
 import connectDB from './config/db.js';
 import cors from 'cors';
+import restaurantRoutes from './routes/resturant.js';
 dovenv.config();
 
 const app = express();
@@ -10,6 +11,8 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/restaurant', restaurantRoutes);
 
 app.listen(PORT, () => {
   connectDB();

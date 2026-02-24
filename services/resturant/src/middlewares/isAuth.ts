@@ -61,3 +61,17 @@ export const authenticate = (
     });
   }
 };
+
+export const isSeller = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (req.user?.role !== 'seller') {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden, user is not a seller',
+    });
+  }
+  next();
+};
