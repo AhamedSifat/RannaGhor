@@ -42,6 +42,8 @@ const RestaurantSchema: Schema<IRestaurant> = new Schema(
   { timestamps: true },
 );
 
+RestaurantSchema.index({ autoLocation: '2dsphere' });
+
 const Restaurant = mongoose.model<IRestaurant & Document>(
   'Restaurant',
   RestaurantSchema,
