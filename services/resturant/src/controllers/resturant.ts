@@ -157,3 +157,40 @@ export const fetchMyRestaurant = tryCatch(
     });
   },
 );
+
+export const updateRestaurantStatus = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    const { status } = req.body;
+    if (typeof status !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid status value',
+      });
+    }
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { ownerId: user._id },
+      { isOpen: status },
+      { new: true },
+    );
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      restaurant,
+    });
+  },
+);

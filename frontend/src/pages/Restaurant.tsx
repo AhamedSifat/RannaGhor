@@ -14,7 +14,6 @@ export default function RestaurantPage() {
 
   if (isLoading) return <LoadingSpinner />;
 
-  console.log(data);
   if (!data?.restaurant) return <AddRestuarant />;
 
   return (
