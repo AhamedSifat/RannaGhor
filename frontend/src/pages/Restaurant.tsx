@@ -10,11 +10,13 @@ import StatusBanner from '../components/restaurant/StatusBanner';
 import { useRestaurant } from '../hooks/useRestaurant';
 
 export default function RestaurantPage() {
-  const { data, isLoading } = useRestaurant();
+  const { data, isLoading, refetch } = useRestaurant();
 
   if (isLoading) return <LoadingSpinner />;
 
   if (!data?.restaurant) return <AddRestuarant />;
+
+  const { restaurant } = data;
 
   return (
     <div className='min-h-screen bg-gray-50 pb-20'>
@@ -25,15 +27,15 @@ export default function RestaurantPage() {
           <div className='p-6 md:p-8'>
             <div className='flex flex-col md:flex-row gap-6'>
               <RestaurantImage
-                image={data.restaurant.image}
-                name={data.restaurant.name}
+                image={restaurant.image}
+                name={restaurant.name}
               />
 
               <div className='flex-1 flex flex-col justify-between'>
                 <RestaurantInfo
-                  name={data.restaurant.name}
-                  address={data.restaurant.autoLocation?.formattedAddress}
-                  description={data.restaurant.description}
+                  name={restaurant.name}
+                  address={restaurant.autoLocation?.formattedAddress}
+                  description={restaurant.description}
                 />
                 <RestaurantStats />
               </div>
@@ -42,13 +44,16 @@ export default function RestaurantPage() {
 
           <div className='bg-gray-50 p-6 md:p-8 border-t border-gray-100'>
             <div className='grid md:grid-cols-2 gap-6'>
-              <RestaurantContact phone={data.restaurant.phone} />
+              <RestaurantContact phone={restaurant.phone} />
               <RestaurantActions />
             </div>
           </div>
         </div>
 
-        <StatusBanner />
+        <StatusBanner
+          isOpen={restaurant.isOpen}
+          onStatusChange={() => refetch()} // Refetch to get updated status
+        />
       </div>
     </div>
   );
