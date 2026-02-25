@@ -194,3 +194,43 @@ export const updateRestaurantStatus = tryCatch(
     });
   },
 );
+
+export const updateRestaurant = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    const { id } = req.params;
+    const { name, description, phone } = req.body;
+
+    const updateData: any = {};
+
+    if (name) updateData.name = name;
+    if (description) updateData.description = description;
+    if (phone) updateData.phone = phone;
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { _id: id!, ownerId: user._id },
+      updateData,
+      { new: true }
+    );
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      restaurant,
+    });
+  }
+);
