@@ -44,7 +44,7 @@ export default function ProtectedLayout() {
     return <Navigate to='/restaurant' replace />;
   }
 
-  //  NORMAL USER CAN'T ACCESS "/restaurant"
+  // //  NORMAL USER CAN'T ACCESS "/restaurant"
   if (user?.role !== 'seller' && location.pathname.startsWith('/restaurant')) {
     return <Navigate to='/' replace />;
   }

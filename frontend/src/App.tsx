@@ -10,6 +10,7 @@ import SelectRole from './pages/SelectRole';
 import Navbar from './components/Navbar';
 import Profile from './pages/Profile';
 import Restaurant from './pages/Restaurant';
+import RestaurantEdit from './pages/RestaurentEdit';
 export const RESTAURANT_API_URL = 'http://localhost:5001';
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
         <Route element={<ProtectedLayout />}>
           <Route path='/' element={<Home />} />
           <Route path='/restaurant' element={<Restaurant />} />
+          <Route path='/restaurant/edit/:id' element={<RestaurantEdit />} />
 
           <Route path='/select-role' element={<SelectRole />} />
           <Route path='/profile' element={<Profile />} />

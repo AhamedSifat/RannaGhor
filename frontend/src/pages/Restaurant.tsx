@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import AddRestuarant from '../components/AddRestuarant';
 import LoadingSpinner from '../components/restaurant/LoadingSpinner';
 import RestaurantActions from '../components/restaurant/RestaurantActions';
@@ -8,15 +9,22 @@ import RestaurantInfo from '../components/restaurant/RestaurantInfo';
 import RestaurantStats from '../components/restaurant/RestaurantStats';
 import StatusBanner from '../components/restaurant/StatusBanner';
 import { useRestaurant } from '../hooks/useRestaurant';
+import { useRestaurantStore } from '../stores/restuarantStore';
 
 export default function RestaurantPage() {
   const { data, isLoading, refetch } = useRestaurant();
+  const { setRestaurant } = useRestaurantStore();
+  const restaurant = data?.restaurant;
+
+  useEffect(() => {
+    if (restaurant) {
+      setRestaurant(restaurant);
+    }
+  }, [restaurant, setRestaurant]);
 
   if (isLoading) return <LoadingSpinner />;
 
   if (!data?.restaurant) return <AddRestuarant />;
-
-  const { restaurant } = data;
 
   return (
     <div className='min-h-screen bg-gray-50 pb-20'>
@@ -45,7 +53,7 @@ export default function RestaurantPage() {
           <div className='bg-gray-50 p-6 md:p-8 border-t border-gray-100'>
             <div className='grid md:grid-cols-2 gap-6'>
               <RestaurantContact phone={restaurant.phone} />
-              <RestaurantActions />
+              <RestaurantActions id={restaurant._id} />
             </div>
           </div>
         </div>
