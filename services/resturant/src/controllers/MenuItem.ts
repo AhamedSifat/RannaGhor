@@ -152,3 +152,53 @@ export const deleteMenuItem = tryCatch(
     });
   },
 );
+
+export const toggleMenuItemAvailability = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    const { itemId } = req.params;
+    if (!itemId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Menu item ID is required',
+      });
+    }
+
+    const item = await MenuItems.findById(itemId);
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        error: 'Menu item not found',
+      });
+    }
+
+    const restaurant = await Restaurant.findOne({
+      _id: item.restaurantId,
+      ownerId: user._id,
+    });
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Associated restaurant not found',
+      });
+    }
+
+    item.isAvailable = !item.isAvailable;
+    await item.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Menu item is now ${item.isAvailable ? 'available' : 'unavailable'}`,
+      item,
+    });
+  },
+);
