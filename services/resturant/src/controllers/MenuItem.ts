@@ -107,3 +107,48 @@ export const getMenuItems = tryCatch(
     });
   },
 );
+
+export const deleteMenuItem = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user || req.user.role !== 'seller') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { itemId } = req.params;
+
+    if (!itemId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Menu item ID is required',
+      });
+    }
+
+    const menuItem = await MenuItems.findById(itemId);
+
+    if (!menuItem) {
+      return res.status(404).json({
+        success: false,
+        error: 'Menu item not found',
+      });
+    }
+
+    const restaurant = await Restaurant.findOne({
+      _id: menuItem.restaurantId,
+      ownerId: req.user._id,
+    });
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Associated restaurant not found',
+      });
+    }
+
+    await MenuItems.findByIdAndDelete(itemId);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Menu item deleted successfully',
+    });
+  },
+);
