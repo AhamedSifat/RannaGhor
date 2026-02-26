@@ -88,3 +88,22 @@ export const createMenuItem = tryCatch(
     });
   },
 );
+
+export const getMenuItems = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { restaurantId } = req.params;
+
+    if (!restaurantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID is required',
+      });
+    }
+
+    const menuItems = await MenuItems.find({ restaurantId });
+    return res.status(200).json({
+      success: true,
+      menuItems,
+    });
+  },
+);
