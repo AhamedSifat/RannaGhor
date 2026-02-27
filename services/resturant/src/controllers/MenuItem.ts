@@ -202,3 +202,22 @@ export const toggleMenuItemAvailability = tryCatch(
     });
   },
 );
+
+export const getMenuItemById = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { itemId } = req.params;
+
+    const menuItem = await MenuItems.findById(itemId);
+    if (!menuItem) {
+      return res.status(404).json({
+        success: false,
+        error: 'Menu item not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      menuItem,
+    });
+  },
+);

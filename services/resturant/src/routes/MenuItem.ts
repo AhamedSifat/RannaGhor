@@ -4,6 +4,7 @@ import {
   getMenuItems,
   deleteMenuItem,
   toggleMenuItemAvailability,
+  getMenuItemById,
 } from '../controllers/MenuItem.js';
 import { authenticate, isSeller } from '../middlewares/isAuth.js';
 import uploadFile from '../middlewares/multer.js';
@@ -18,5 +19,6 @@ router.put(
   isSeller,
   toggleMenuItemAvailability,
 );
+router.get('/:itemId', authenticate, getMenuItemById);
 
 export default router;
