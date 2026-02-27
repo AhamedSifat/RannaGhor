@@ -25,6 +25,11 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
     mutationFn: createMenuItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-items', restaurantId] });
+      setName('');
+      setDescription('');
+      setPrice('');
+      setImage(null);
+      setImagePreview(null);
       onClose();
       toast.success('Menu item added!');
     },
@@ -64,12 +69,6 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
 
     try {
       createMenuItemMutation(formData);
-      // Reset form
-      setName('');
-      setDescription('');
-      setPrice('');
-      setImage(null);
-      setImagePreview(null);
     } catch {
       toast.error('Failed to add item');
     }
@@ -187,7 +186,7 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
           {/* Price */}
           <div>
             <label className='block text-sm font-semibold text-gray-700 mb-2'>
-              Price (₹) *
+              Price ($) *
             </label>
             <input
               type='number'
