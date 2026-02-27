@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMenuItems } from '../hooks/useMenuItems';
 import LoadingSpinner from '../components/restaurant/LoadingSpinner';
 import MenuItemCard from '../components/menu/MenuItemCard';
@@ -7,18 +7,25 @@ import EmptyMenuState from '../components/menu/EmptyMenuState';
 import type { IMenuItem } from '../type';
 import { useParams } from 'react-router-dom';
 import { FcPlus } from 'react-icons/fc';
+import { useMenuStore } from '../stores/menuStore';
 
 export default function MenuManagement() {
   const { id } = useParams<{ id: string }>();
+  const { setMenuItems } = useMenuStore();
   const { menuItems: data, isLoading, refetch } = useMenuItems(id || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  if (isLoading) return <LoadingSpinner />;
-
   const menuItems = data?.menuItems || [];
+
+  useEffect(() => {
+    if (data && data.menuItems) {
+      setMenuItems(data.menuItems);
+    }
+  }, [data, setMenuItems]);
+
   const availableCount = menuItems.filter(
     (i: IMenuItem) => i.isAvailable,
   ).length;
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-rose-50/30 pb-20'>

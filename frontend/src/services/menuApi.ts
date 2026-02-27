@@ -48,3 +48,29 @@ export const createMenuItem = async (formData: FormData) => {
   );
   return data;
 };
+
+export const fetchMenuById = async (menuItemId: string) => {
+  const token = localStorage.getItem('token');
+  const { data } = await axios.get(
+    `${RESTAURANT_API_URL}/api/item/${menuItemId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};
+
+export const updateMenuItem = async (
+  menuItemId: string,
+  formData: FormData,
+) => {
+  const token = localStorage.getItem('token');
+  const { data } = await axios.put(
+    `${RESTAURANT_API_URL}/api/item/update/${menuItemId}`,
+    formData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};

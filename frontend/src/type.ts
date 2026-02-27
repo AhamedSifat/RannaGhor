@@ -16,6 +16,7 @@ export interface IRestaurant {
 }
 
 export interface IMenuItem {
+  id: string;
   _id: string;
   name: string;
   description: string;
