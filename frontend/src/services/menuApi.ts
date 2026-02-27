@@ -1,0 +1,49 @@
+import axios from 'axios';
+import { RESTAURANT_API_URL } from '../App';
+
+export const fetchMenuItems = async (restaurantId: string) => {
+  const token = localStorage.getItem('token');
+
+  const { data } = await axios.get(
+    `${RESTAURANT_API_URL}/api/menu/all/${restaurantId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};
+
+export const toogleMenuItemAvailability = async (menuItemId: string) => {
+  const token = localStorage.getItem('token');
+
+  const { data } = await axios.put(
+    `${RESTAURANT_API_URL}/api/menu/toggle/${menuItemId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};
+
+export const deleteMenuItem = async (menuItemId: string) => {
+  const token = localStorage.getItem('token');
+  const { data } = await axios.delete(
+    `${RESTAURANT_API_URL}/api/menu/delete/${menuItemId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};
+
+export const createMenuItem = async (formData: FormData) => {
+  const token = localStorage.getItem('token');
+  const { data } = await axios.post(
+    `${RESTAURANT_API_URL}/api/menu/new`,
+    formData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return data;
+};
