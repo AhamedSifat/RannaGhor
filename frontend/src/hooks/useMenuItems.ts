@@ -5,7 +5,6 @@ export const useMenuItems = (restaurantId: string) => {
   const menuQuery = useQuery({
     queryKey: ['menu-items', restaurantId],
     queryFn: () => fetchMenuItems(restaurantId),
-    retry: false,
   });
 
   return {

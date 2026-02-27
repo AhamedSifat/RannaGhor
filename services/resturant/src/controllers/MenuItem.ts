@@ -13,7 +13,7 @@ export const createMenuItem = tryCatch(
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const restaurant = await Restaurant.findOne({ owner: req.user._id });
+    const restaurant = await Restaurant.findOne({ ownerId: req.user._id });
 
     if (!restaurant) {
       return res.status(404).json({ message: 'Restaurant not found' });

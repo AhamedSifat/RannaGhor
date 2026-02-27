@@ -5,7 +5,7 @@ export const fetchMenuItems = async (restaurantId: string) => {
   const token = localStorage.getItem('token');
 
   const { data } = await axios.get(
-    `${RESTAURANT_API_URL}/api/menu/all/${restaurantId}`,
+    `${RESTAURANT_API_URL}/api/item/all/${restaurantId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -17,7 +17,8 @@ export const toogleMenuItemAvailability = async (menuItemId: string) => {
   const token = localStorage.getItem('token');
 
   const { data } = await axios.put(
-    `${RESTAURANT_API_URL}/api/menu/toggle/${menuItemId}`,
+    `${RESTAURANT_API_URL}/api/item/toggle/${menuItemId}`,
+    null,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -28,7 +29,7 @@ export const toogleMenuItemAvailability = async (menuItemId: string) => {
 export const deleteMenuItem = async (menuItemId: string) => {
   const token = localStorage.getItem('token');
   const { data } = await axios.delete(
-    `${RESTAURANT_API_URL}/api/menu/delete/${menuItemId}`,
+    `${RESTAURANT_API_URL}/api/item/delete/${menuItemId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -38,8 +39,12 @@ export const deleteMenuItem = async (menuItemId: string) => {
 
 export const createMenuItem = async (formData: FormData) => {
   const token = localStorage.getItem('token');
-  const { data } = await axios.post(`${RESTAURANT_API_URL}/api/new`, formData, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const { data } = await axios.post(
+    `${RESTAURANT_API_URL}/api/item/new`,
+    formData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
   return data;
 };
