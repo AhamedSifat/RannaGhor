@@ -38,12 +38,8 @@ export const deleteMenuItem = async (menuItemId: string) => {
 
 export const createMenuItem = async (formData: FormData) => {
   const token = localStorage.getItem('token');
-  const { data } = await axios.post(
-    `${RESTAURANT_API_URL}/api/menu/new`,
-    formData,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+  const { data } = await axios.post(`${RESTAURANT_API_URL}/api/new`, formData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return data;
 };

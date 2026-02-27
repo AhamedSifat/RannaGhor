@@ -1,27 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMenuItems, createMenuItem } from '../services/menuApi';
+import { useQuery } from '@tanstack/react-query';
+import { fetchMenuItems } from '../services/menuApi';
 
 export const useMenuItems = (restaurantId: string) => {
-  const queryClient = useQueryClient();
-
   const menuQuery = useQuery({
     queryKey: ['menu-items', restaurantId],
     queryFn: () => fetchMenuItems(restaurantId),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: createMenuItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-items', restaurantId] });
-    },
+    retry: false,
   });
 
   return {
     menuItems: menuQuery.data,
     isLoading: menuQuery.isLoading,
     error: menuQuery.error,
-
-    createMenuItem: createMutation.mutate,
-    isCreating: createMutation.isPending,
+    refetch: menuQuery.refetch,
   };
 };

@@ -16,10 +16,10 @@ export default function RestaurantActions({ id }: { id: string }) {
           <FcEditImage size={18} className='text-white' />
           Edit Restaurant
         </Link>
-        <button className='w-full flex items-center justify-center gap-2 p-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#E23774] hover:text-[#E23774] transition-colors'>
+        <Link to={`/restaurant/${id}/menu`} className='w-full flex items-center justify-center gap-2 p-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#E23774] hover:text-[#E23774] transition-colors'>
           <FcList size={18} />
           Manage Menu
-        </button>
+        </Link>
       </div>
     </div>
   );
