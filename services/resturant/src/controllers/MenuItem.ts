@@ -221,3 +221,32 @@ export const getMenuItemById = tryCatch(
     });
   },
 );
+
+export const updateMenuItem = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user || req.user.role !== 'seller') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const { itemId } = req.params;
+    const { name, price, description } = req.body;
+    if (!itemId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Menu item ID is required',
+      });
+    }
+
+      const updateData: any = {};
+      if (name) updateData.name = name;
+      if (price) updateData.price = price;
+      if (description) updateData.description = description;
+      
+      const updatedMenuItem = await MenuItems.findByIdAndUpdate(itemId, updateData, { new: true });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Menu item updated successfully',
+        updatedMenuItem,
+      });
+  },
+);
