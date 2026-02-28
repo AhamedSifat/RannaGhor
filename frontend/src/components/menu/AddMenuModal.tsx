@@ -1,23 +1,39 @@
 import { useState, useRef } from 'react';
-
 import toast from 'react-hot-toast';
 import { FcCamera, FcShop } from 'react-icons/fc';
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createMenuItem } from '../../services/menuApi';
+import { createMenuItem, updateMenuItem } from '../../services/menuApi';
+import { useMenuStore } from '../../stores/menuStore';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   restaurantId: string;
+  editMode?: boolean;
+  menuItemId?: string;
 }
 
-export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+export default function AddMenuModal({
+  isOpen,
+  onClose,
+  restaurantId,
+  editMode = false,
+  menuItemId,
+}: Props) {
+  const { getMenuItemById } = useMenuStore();
+
+  const existingItem =
+    editMode && menuItemId ? getMenuItemById(menuItemId) : null;
+
+  const [name, setName] = useState(existingItem?.name || '');
+  const [description, setDescription] = useState(
+    existingItem?.description || '',
+  );
+  const [price, setPrice] = useState(existingItem?.price?.toString() || '');
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    existingItem?.image || null,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -34,6 +50,25 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
       toast.success('Menu item added!');
     },
   });
+
+  const { mutate: updateMenuItemMutation, isPending: isUpdating } = useMutation(
+    {
+      mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
+        updateMenuItem(id, formData),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['menu-items', restaurantId],
+        });
+        setName('');
+        setDescription('');
+        setPrice('');
+        setImage(null);
+        setImagePreview(null);
+        onClose();
+        toast.success('Menu item updated!');
+      },
+    },
+  );
 
   if (!isOpen) return null;
 
@@ -56,21 +91,24 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !price || !description || !image) {
-      toast.error('Please fill all fields');
-      return;
-    }
-
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', price);
-    formData.append('file', image);
+    if (image) formData.append('file', image);
 
-    try {
+    if (editMode && menuItemId) {
+      if (!name || !price || !description) {
+        toast.error('Please fill all fields');
+        return;
+      }
+      updateMenuItemMutation({ id: menuItemId, formData });
+    } else {
+      if (!name || !price || !description || !image) {
+        toast.error('Please fill all fields');
+        return;
+      }
       createMenuItemMutation(formData);
-    } catch {
-      toast.error('Failed to add item');
     }
   };
 
@@ -91,8 +129,12 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
               <FcShop size={24} />
             </div>
             <div>
-              <h2 className='text-xl font-bold text-gray-900'>Add Menu Item</h2>
-              <p className='text-sm text-gray-500'>Create a new dish</p>
+              <h2 className='text-xl font-bold text-gray-900'>
+                {editMode ? 'Edit Menu Item' : 'Add Menu Item'}
+              </h2>
+              <p className='text-sm text-gray-500'>
+                {editMode ? 'Update dish details' : 'Create a new dish'}
+              </p>
             </div>
           </div>
           <button
@@ -120,16 +162,25 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
           {/* Image Upload */}
           <div>
             <label className='block text-sm font-semibold text-gray-700 mb-2'>
-              Item Image *
+              Item Image {!editMode && '*'}
+              {editMode && (
+                <span className='ml-2 text-xs font-normal text-gray-400'>
+                  (cannot be changed)
+                </span>
+              )}
             </label>
             {!imagePreview ? (
               <div
-                onClick={() => fileInputRef.current?.click()}
-                className='w-full aspect-video rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 hover:border-[#E23774] hover:bg-rose-50 cursor-pointer overflow-hidden transition-all flex flex-col items-center justify-center'
+                onClick={() => !editMode && fileInputRef.current?.click()}
+                className={`w-full aspect-video rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden transition-all flex flex-col items-center justify-center ${
+                  editMode
+                    ? 'opacity-60 cursor-not-allowed'
+                    : 'hover:border-[#E23774] hover:bg-rose-50 cursor-pointer'
+                }`}
               >
                 <FcCamera size={40} className='mb-2' />
                 <span className='text-sm text-gray-500'>
-                  Click to upload image
+                  {editMode ? 'No image available' : 'Click to upload image'}
                 </span>
                 <input
                   ref={fileInputRef}
@@ -137,6 +188,7 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
                   accept='image/*'
                   onChange={handleImageChange}
                   className='hidden'
+                  disabled={editMode}
                 />
               </div>
             ) : (
@@ -146,25 +198,34 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
                   alt='Preview'
                   className='w-full h-full object-cover'
                 />
-                <button
-                  type='button'
-                  onClick={handleCancelImage}
-                  className='absolute top-2 right-2 bg-white/90 text-red-500 p-2 rounded-full shadow-lg hover:bg-white transition-colors'
-                >
-                  <svg
-                    className='w-5 h-5'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
+                {editMode && (
+                  <div className='absolute inset-0 bg-black/30 flex items-center justify-center'>
+                    <span className='text-white text-sm font-medium bg-black/40 px-3 py-1 rounded-full'>
+                      Image cannot be changed
+                    </span>
+                  </div>
+                )}
+                {!editMode && (
+                  <button
+                    type='button'
+                    onClick={handleCancelImage}
+                    className='absolute top-2 right-2 bg-white/90 text-red-500 p-2 rounded-full shadow-lg hover:bg-white transition-colors'
                   >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M6 18L18 6M6 6l12 12'
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      className='w-5 h-5'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M6 18L18 6M6 6l12 12'
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -215,10 +276,10 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
           {/* Submit */}
           <button
             type='submit'
-            disabled={isPending}
+            disabled={isPending || isUpdating}
             className='w-full py-4 bg-gradient-to-r from-[#E23774] to-rose-500 text-white font-semibold rounded-xl shadow-lg shadow-rose-200 hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2'
           >
-            {isPending ? (
+            {isPending || isUpdating ? (
               <>
                 <svg
                   className='animate-spin h-5 w-5'
@@ -240,8 +301,10 @@ export default function AddMenuModal({ isOpen, onClose, restaurantId }: Props) {
                     d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                   ></path>
                 </svg>
-                Adding...
+                {editMode ? 'Updating...' : 'Adding...'}
               </>
+            ) : editMode ? (
+              'Update Item'
             ) : (
               'Add to Menu'
             )}
