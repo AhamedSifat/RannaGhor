@@ -5,6 +5,7 @@ import {
   updateRestaurantStatus,
   updateRestaurant,
   getNearbyRestaurants,
+  getRestaurantById,
 } from '../controllers/resturant.js';
 import { authenticate, isSeller } from '../middlewares/isAuth.js';
 import uploadFile from '../middlewares/multer.js';
@@ -15,5 +16,6 @@ router.get('/my', authenticate, isSeller, fetchMyRestaurant);
 router.put('/update', authenticate, isSeller, updateRestaurantStatus);
 router.put('/:id/edit', authenticate, isSeller, uploadFile, updateRestaurant);
 router.get('/all', authenticate, getNearbyRestaurants);
+router.get('/:id', authenticate, getRestaurantById);
 
 export default router;

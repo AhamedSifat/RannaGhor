@@ -295,3 +295,21 @@ export const getNearbyRestaurants = tryCatch(
     });
   },
 );
+
+export const getRestaurantById = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const restaurant = await Restaurant.findById(id);
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      restaurant,
+    });
+  },
+);
