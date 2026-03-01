@@ -1,5 +1,5 @@
 import { AuthenticatedRequest } from '../middlewares/isAuth.js';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { tryCatch } from '../middlewares/trycatch.js';
 import Restaurant from '../models/Restaurant.js';
 import getBufferDataUri from '../config/datauri.js';
@@ -218,7 +218,7 @@ export const updateRestaurant = tryCatch(
     const restaurant = await Restaurant.findOneAndUpdate(
       { _id: id!, ownerId: user._id },
       updateData,
-      { new: true }
+      { new: true },
     );
 
     if (!restaurant) {
@@ -232,5 +232,66 @@ export const updateRestaurant = tryCatch(
       success: true,
       restaurant,
     });
-  }
+  },
+);
+
+export const getNearbyRestaurants = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { latitude, longitude, radius = '5000', search = '' } = req.query;
+
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    const maxRadius = Number(radius);
+
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing latitude or longitude',
+      });
+    }
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid coordinates',
+      });
+    }
+
+    const query: any = { isVerified: true };
+
+    if (search && typeof search === 'string') {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    const restaurants = await Restaurant.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [lng, lat],
+          },
+          distanceField: 'distance',
+          maxDistance: maxRadius,
+          spherical: true,
+          query,
+        },
+      },
+      {
+        $sort: { isOpen: -1, distance: 1 },
+      },
+      {
+        $addFields: {
+          distanceKm: {
+            $round: [{ $divide: ['$distance', 1000] }, 2],
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      restaurants,
+      count: restaurants.length,
+    });
+  },
 );
