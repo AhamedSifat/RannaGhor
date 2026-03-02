@@ -22,3 +22,20 @@ export const createRestaurant = async (formData: FormData) => {
   );
   return data;
 };
+
+export const fetchRestaurants = async (
+  latitude: number,
+  longitude: number,
+  search?: string,
+) => {
+  if (!latitude || !longitude) {
+    throw new Error('Latitude and longitude are required');
+  }
+  const { data } = await axios.get(`${RESTAURANT_API_URL}/api/restaurant/all`, {
+    params: { latitude, longitude, search },
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+  return data;
+};

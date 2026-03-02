@@ -1,9 +1,19 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useRestaurantData } from '../hooks/useRestaurant';
 
 const Home = () => {
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { location } = useAuthStore();
+  const search = searchParams.get('search') || '';
+
+  const { restaurants, isLoadingRestaurants } = useRestaurantData({
+    location,
+    search,
+    enabled: true,
+  });
 
   const handleLogout = () => {
     logout();

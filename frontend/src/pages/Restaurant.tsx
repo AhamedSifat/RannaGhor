@@ -8,11 +8,15 @@ import RestaurantImage from '../components/restaurant/RestaurantImage';
 import RestaurantInfo from '../components/restaurant/RestaurantInfo';
 import RestaurantStats from '../components/restaurant/RestaurantStats';
 import StatusBanner from '../components/restaurant/StatusBanner';
-import { useRestaurant } from '../hooks/useRestaurant';
+import { useRestaurantData } from '../hooks/useRestaurant';
 import { useRestaurantStore } from '../stores/restuarantStore';
 
 export default function RestaurantPage() {
-  const { data, isLoading, refetch } = useRestaurant();
+  const {
+    myRestaurant: data,
+    isLoadingMyRestaurant: isLoading,
+    refetchMyRestaurant: refetch,
+  } = useRestaurantData({ enabled: true });
   const { setRestaurant } = useRestaurantStore();
   const restaurant = data?.restaurant;
 

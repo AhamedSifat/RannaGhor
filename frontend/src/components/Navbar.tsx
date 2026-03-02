@@ -10,8 +10,6 @@ export default function Navbar() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
 
-  console.log(city);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       if (search) {
