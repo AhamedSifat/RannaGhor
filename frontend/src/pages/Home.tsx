@@ -1,9 +1,9 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useRestaurantData } from '../hooks/useRestaurant';
-import LoadingSpinner from '../components/restaurant/LoadingSpinner';
 import RestaurantCard from '../components/RestaurantCard';
 import type { IRestaurant } from '../type';
+import RestaurantCardSkeleton from '../components/Restaurantcardskeleton';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const Home = () => {
   };
 
   if (isLoadingRestaurants) {
-    return <LoadingSpinner />;
+    return <RestaurantCardSkeleton />;
   }
 
   const userLocation = location
