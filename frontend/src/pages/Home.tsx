@@ -22,10 +22,6 @@ const Home = () => {
     navigate('/login');
   };
 
-  if (isLoadingRestaurants) {
-    return <RestaurantCardSkeleton />;
-  }
-
   const userLocation = location
     ? {
         lat: location.latitude,
@@ -58,13 +54,17 @@ const Home = () => {
           </div>
         ) : (
           <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {restaurants?.restaurants.map((restaurant: IRestaurant) => (
-              <RestaurantCard
-                key={restaurant._id}
-                restaurant={restaurant}
-                userLocation={userLocation as { lat: number; lng: number }}
-              />
-            ))}
+            {isLoadingRestaurants
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <RestaurantCardSkeleton key={i} />
+                ))
+              : restaurants?.restaurants.map((restaurant: IRestaurant) => (
+                  <RestaurantCard
+                    key={restaurant._id}
+                    restaurant={restaurant}
+                    userLocation={userLocation as { lat: number; lng: number }}
+                  />
+                ))}
           </div>
         )}
       </div>
