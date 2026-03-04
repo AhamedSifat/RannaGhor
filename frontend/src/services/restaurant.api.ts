@@ -39,3 +39,15 @@ export const fetchRestaurants = async (
   });
   return data;
 };
+
+export const fetchRestaurantById = async (id: string) => {
+  const { data } = await axios.get(
+    `${RESTAURANT_API_URL}/api/restaurant/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    },
+  );
+  return data;
+};
