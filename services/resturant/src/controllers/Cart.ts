@@ -15,7 +15,7 @@ export const addToCart = tryCatch(
     }
 
     const userId = req.user._id;
-    const { restaurantId, itemId} = req.body;
+    const { restaurantId, itemId } = req.body;
 
     if (
       !mongoose.Types.ObjectId.isValid(restaurantId) ||
@@ -46,5 +46,37 @@ export const addToCart = tryCatch(
     );
 
     res.status(200).json({ message: 'Item added to cart', cart: cartItem });
+  },
+);
+
+export const fetchMyCart = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    if (req.user.role !== 'customer') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const cartItems = await Cart.find({ userId: req.user._id })
+      .populate('itemId')
+      .populate('restaurantId');
+
+    let subTotal = 0;
+    let cartLength = 0;
+
+    for (const cartItem of cartItems) {
+      const item: any = cartItem.itemId;
+      subTotal += item.price * cartItem.quantity;
+      cartLength += cartItem.quantity;
+    }
+
+    return res.json({
+      success: true,
+      cartLength,
+      subTotal,
+      cart: cartItems,
+    });
   },
 );
