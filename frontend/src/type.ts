@@ -23,3 +23,9 @@ export interface IMenuItem {
   image: string;
   isAvailable: boolean;
 }
+export interface ICart {
+  restaurantId: string;
+  userId: string;
+  itemId: string;
+  quantity: number;
+}
