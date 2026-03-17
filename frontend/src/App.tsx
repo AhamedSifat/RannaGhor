@@ -13,6 +13,7 @@ import Restaurant from './pages/Restaurant';
 import RestaurantEdit from './pages/RestaurentEdit';
 import MenuManagement from './pages/MenuManagement';
 import { useCartStore } from './stores/cartsStore';
+import IndividualRestaurant from './pages/IndividualRestaurant';
 export const RESTAURANT_API_URL = 'http://localhost:5001';
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
           <Route path='/restaurant' element={<Restaurant />} />
           <Route path='/restaurant/edit/:id' element={<RestaurantEdit />} />
           <Route path='/restaurant/:id/menu' element={<MenuManagement />} />
+          <Route path='/restaurant/:id' element={<IndividualRestaurant />} />
 
           <Route path='/select-role' element={<SelectRole />} />
           <Route path='/profile' element={<Profile />} />
