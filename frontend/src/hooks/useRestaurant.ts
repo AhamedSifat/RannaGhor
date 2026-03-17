@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyRestaurant, fetchRestaurants } from '../services/restaurant.api';
+import { useAuthStore } from '../stores/authStore';
 
 interface UseRestaurantOptions {
   location?: { latitude: number; longitude: number } | null;
@@ -12,11 +13,13 @@ export const useRestaurantData = ({
   search,
   enabled = true,
 }: UseRestaurantOptions) => {
+  const user = useAuthStore((state) => state.user);
+
   const myRestaurantQuery = useQuery({
     queryKey: ['my-restaurant'],
     queryFn: getMyRestaurant,
     retry: false,
-    enabled: !!localStorage.getItem('token'),
+    enabled: Boolean(user) && user?.role === 'seller',
   });
 
   const restaurantsQuery = useQuery({
