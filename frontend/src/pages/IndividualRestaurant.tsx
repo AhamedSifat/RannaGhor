@@ -27,7 +27,6 @@ export default function IndividualRestaurant() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Handle scroll for parallax effect
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
@@ -87,8 +86,6 @@ export default function IndividualRestaurant() {
     (acc, item) => acc + item.quantity,
     0,
   );
-
-  console.log(cart);
 
   // --- Loading/Error States ---
   if (isRestaurantLoading || isMenuLoading)
