@@ -4,6 +4,7 @@ import {
   fetchMyCart,
   incrementCartItem,
   decrementCartItem,
+  clearCart,
 } from '../controllers/Cart.js';
 import { authenticate } from '../middlewares/isAuth.js';
 
@@ -13,5 +14,6 @@ router.post('/add', authenticate, addToCart);
 router.get('/all', authenticate, fetchMyCart);
 router.put('/inc', authenticate, incrementCartItem);
 router.put('/dec', authenticate, decrementCartItem);
+router.delete('/clear', authenticate, clearCart);
 
 export default router;
