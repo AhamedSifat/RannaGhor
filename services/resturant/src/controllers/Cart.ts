@@ -112,3 +112,43 @@ export const incrementCartItem = tryCatch(
     });
   },
 );
+
+export const decrementCartItem = tryCatch(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?._id;
+    const { itemId } = req.body;
+
+    if (!userId || !itemId) {
+      return res.status(400).json({
+        message: 'Invalid Request',
+      });
+    }
+
+    const cartItem = await Cart.findOne({
+      userId,
+      itemId,
+    });
+
+    if (!cartItem) {
+      return res.status(404).json({
+        message: 'Item not found',
+      });
+    }
+
+    if (cartItem.quantity === 1) {
+      await Cart.deleteOne({ userId, itemId });
+
+      return res.json({
+        message: 'Item removed from cart',
+      });
+    }
+
+    cartItem.quantity -= 1;
+    await cartItem.save();
+
+    res.json({
+      message: 'Quantity decreased',
+      cartItem,
+    });
+  },
+);
